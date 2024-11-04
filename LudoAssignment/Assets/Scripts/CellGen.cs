@@ -1,5 +1,6 @@
 using UnityEngine;
 
+//this is an editor script to genrate cells eveningly, it doesn't effect the game
 public class CellGen : MonoBehaviour
 {
     [SerializeField] GameObject prefab;

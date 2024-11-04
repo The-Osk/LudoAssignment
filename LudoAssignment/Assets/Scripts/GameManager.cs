@@ -10,15 +10,18 @@ public class GameManager : MonoBehaviour
     public Cell[] cells;
     public Cell startCell;
     public Cell endCell;
-    public int x = 1;
     public int currentPos = 0;
+    //Start and end position for the blue pieces
     public int startPos = 1;
     public int endPos = 57;
+
     public GameObject player;
+    //click blocker to prevent double inputs
     public GameObject clickBlocker;
 
     private bool canPlayerMove = false;
 
+    //pity counter for the start of the game, the player will get a 6 by the 3rd roll  
     int rollPity = 0;
     int rollResult;
 
@@ -35,11 +38,10 @@ public class GameManager : MonoBehaviour
     [ContextMenu("Reset")]
     public void Reset()
     {
+        //The reset moves the piece to the start position and set the current position to zero
         currentPos = 0;
         rollPity = 0;
         MoveToStartTween();
-
-        //MoveTween(ApiHandler.Instance.lastResult);
     }
 
     [ContextMenu("Roll")]
@@ -49,12 +51,14 @@ public class GameManager : MonoBehaviour
         //MoveTween(ApiHandler.Instance.lastResult);
     }
 
+    //Enables the click blocker, request a roll form the api, and then handle the roll result
     IEnumerator GetRollResult()
     {
         clickBlocker.SetActive(true);
         yield return StartCoroutine(ApiHandler.Instance.SendRequest());
         rollResult = ApiHandler.Instance.lastResult;
 
+        //handles the case of the starting position for the piece
         if (currentPos == 0)
         {
             if (ApiHandler.Instance.lastResult == 6)
@@ -71,15 +75,15 @@ public class GameManager : MonoBehaviour
                 StartCoroutine(RollDiceAnimation(true, 0));
                 rollPity++;
             }
-        }
+        }//handles the final roll for the piece
         else if(currentPos + rollResult == endPos)
         {
             StartCoroutine(RollDiceAnimation(false, rollResult, true));
-        }
+        }//handles the case where the result of the roll exceeds the available cells for the piece
         else if(currentPos + rollResult > endPos)
         {
             StartCoroutine(RollDiceAnimation(true, rollResult));
-        }
+        }//handles the normal case for the piece
         else
         {
             StartCoroutine(RollDiceAnimation(false, rollResult));
@@ -87,6 +91,8 @@ public class GameManager : MonoBehaviour
     }
 
     int moveLength = 0;
+
+    //The Roll animation is changing between the 6 sides of the dice
     IEnumerator RollDiceAnimation(bool FailedRoll, int moveLength, bool endingMove = false)
     {
         this.moveLength = moveLength;
@@ -101,7 +107,10 @@ public class GameManager : MonoBehaviour
 
             yield return new WaitForSeconds(0.05f);
         }
+        //the final side is the number given by the api
         diceRend.sprite = diceSides[rollResult - 1];
+
+        //In case the Roll failed (not a six at the start, or the given value is too big at the end of the track) 
         if (!FailedRoll)
         {
             if (endingMove)

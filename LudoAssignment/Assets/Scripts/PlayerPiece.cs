@@ -1,5 +1,6 @@
 using UnityEngine;
 
+//Detects when the player piece is click and request to move from gameManager, the gameManager handles the movement
 public class PlayerPiece : MonoBehaviour
 {
     private void OnMouseDown()
